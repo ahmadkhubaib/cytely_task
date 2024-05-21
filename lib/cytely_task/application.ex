@@ -17,7 +17,8 @@ defmodule CytelyTask.Application do
       # Start a worker by calling: CytelyTask.Worker.start_link(arg)
       # {CytelyTask.Worker, arg},
       # Start to serve requests, typically the last entry
-      CytelyTaskWeb.Endpoint
+      CytelyTaskWeb.Endpoint,
+      {CytelyTask.TelemetrySupervisor, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

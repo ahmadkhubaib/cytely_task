@@ -11,10 +11,13 @@ defmodule CytelyTaskWeb.Telemetry do
     children = [
       # Telemetry poller will execute the given period measurements
       # every 10_000ms. Learn more here: https://hexdocs.pm/telemetry_metrics
-      {:telemetry_poller, measurements: periodic_measurements(), period: 10_000}
+      {:telemetry_poller, measurements: periodic_measurements(), period: 10_000},
       # Add reporters as children of your supervision tree.
-      # {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
+      {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
     ]
+
+    :telemetry.attach("request_count_handler", [:phoenix, :endpoint, :stop], &handle_event/4, %{})
+    :telemetry.attach("request_duration_handler", [:phoenix, :router_dispatch, :stop], &handle_event/4, %{})
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -88,5 +91,15 @@ defmodule CytelyTaskWeb.Telemetry do
       # This function must call :telemetry.execute/3 and a metric must be added above.
       # {CytelyTaskWeb, :count_users, []}
     ]
+  end
+
+  def handle_event([:phoenix, :endpoint, :stop], measurements, _metadata, _config) do
+    duration = measurements[:duration]
+    CytelyTaskWeb.TelemetryStorage.add_data(:request_duration, duration)
+  end
+
+  def handle_event([:phoenix, :router_dispatch, :stop], measurements, _metadata, _config) do
+    duration = measurements[:duration]
+    CytelyTaskWeb.TelemetryStorage.add_data(:request_duration, duration)
   end
 end

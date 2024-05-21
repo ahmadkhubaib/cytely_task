@@ -12,6 +12,8 @@ defmodule CytelyTaskWeb.UserLoginLive do
             Sign up
           </.link>
           for an account now.
+          <hr>
+          Please visit <b>priv/repo/seeds.exs</b> for admin and user accounts
         </:subtitle>
       </.header>
 

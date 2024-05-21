@@ -20,7 +20,7 @@ defmodule CytelyTaskWeb.Router do
   scope "/", CytelyTaskWeb do
     pipe_through :browser
 
-    live "/", HomeLive, :index
+    live "/", IndexLive, :index
   end
 
   # Other scopes may use custom stacks.
@@ -40,7 +40,7 @@ defmodule CytelyTaskWeb.Router do
     scope "/dev" do
       pipe_through :browser
 
-      live_dashboard "/dashboard", metrics: CytelyTaskWeb.Telemetry
+      live_dashboard "/dashboard", metrics: CytelyTaskWeb.Telemetry, metrics_history: {CytelyTaskWeb.TelemetryStorage, :metrics_history, []}
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
   end
@@ -66,6 +66,8 @@ defmodule CytelyTaskWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{CytelyTaskWeb.UserAuth, :ensure_authenticated}] do
+      live "/dashboard", HomeLive, :index
+      live "/metrics", MetricsLive, :index
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
