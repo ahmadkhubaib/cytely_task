@@ -32,7 +32,7 @@ defmodule CytelyTaskWeb.TelemetryStorage do
 
   def handle_call({:get_data, metric}, _from, state) do
     data = Map.get(state, metric, [])
-    # Return the latest 10 data points
-    {:reply, Enum.take(data, 10), state}
+    # Return the latest data point
+    {:reply, Enum.take(data, 1), state}
   end
 end

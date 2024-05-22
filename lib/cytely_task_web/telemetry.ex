@@ -18,6 +18,7 @@ defmodule CytelyTaskWeb.Telemetry do
 
     :telemetry.attach("request_count_handler", [:phoenix, :endpoint, :stop], &handle_event/4, %{})
     :telemetry.attach("request_duration_handler", [:phoenix, :router_dispatch, :stop], &handle_event/4, %{})
+    :telemetry.attach("total_run_queue", [:vm, :memory], &handle_event/4, %{})
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -101,5 +102,9 @@ defmodule CytelyTaskWeb.Telemetry do
   def handle_event([:phoenix, :router_dispatch, :stop], measurements, _metadata, _config) do
     duration = measurements[:duration]
     CytelyTaskWeb.TelemetryStorage.add_data(:request_duration, duration)
+  end
+
+  def handle_event([:vm, :memory], measurements, _metadata, _config) do
+    CytelyTaskWeb.TelemetryStorage.add_data(:vm, measurements)
   end
 end

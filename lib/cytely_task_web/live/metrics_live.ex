@@ -5,7 +5,9 @@ defmodule CytelyTaskWeb.MetricsLive do
     ~H"""
     <div class="flex flex-col flex-1 overflow-y-auto">
       <div class="p-4">
-      <div id="PlotlyHooks" phx-hook="PlotlyHooks"><!-- Plotly chart will be drawn inside this DIV --></div>
+        <div id="PlotlyHooks" phx-hook="PlotlyHooks">
+          <!-- Plotly chart will be drawn inside this DIV -->
+        </div>
       </div>
     </div>
     """
@@ -18,7 +20,8 @@ defmodule CytelyTaskWeb.MetricsLive do
 
   def handle_info(:tick, socket) do
     data = fetch_telemetry_data()
-    categories = Enum.map(1..length(data), &Integer.to_string/1)
+    categories = data |> Map.keys
+    data = data |> Map.values
 
     {:noreply,
      assign(socket, data: data, categories: categories)
@@ -26,7 +29,7 @@ defmodule CytelyTaskWeb.MetricsLive do
   end
 
   def fetch_telemetry_data do
-    CytelyTaskWeb.TelemetryStorage.get_data(:request_duration)
+    CytelyTaskWeb.TelemetryStorage.get_data(:vm) |> Enum.at(0)
   end
 
   def handle_params(_param, _session, socket) do
